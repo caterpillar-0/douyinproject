@@ -1,0 +1,11 @@
+server:
+  host: 192.168.43.12 # ip address
+  port: 8080
+
+
+mysql:
+  host: 127.0.0.1
+  port: 3306
+  name: root
+  password : 123456
+  database: douyin3
