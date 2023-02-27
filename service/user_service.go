@@ -39,8 +39,7 @@ func (c *userService) Register(username string, password string) (*dto.UserDTO, 
 
 	//1、查询数据库是否存在
 	uq := dao.Q.User
-	_, err := uq.Where(uq.Username.Eq(username)).First()
-	if err == nil {
+	if _, err := uq.Where(uq.Username.Eq(username)).First(); err == nil {
 		return nil, errors.New("username already exists")
 	}
 
@@ -53,12 +52,11 @@ func (c *userService) Register(username string, password string) (*dto.UserDTO, 
 		Password: hashPassword,
 	}
 
-	err = uq.Create(&user)
-	if err != nil {
+	if err := uq.Create(&user); err != nil {
 		return nil, errors.New("create user failed")
 	}
 	//token生成
-	token := username + "&" + password
+	token, _ := utils.GenToken(user.ID)
 
 	//4、返回结果
 	return &dto.UserDTO{UserID: user.ID, Token: token}, nil
