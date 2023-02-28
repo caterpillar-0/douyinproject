@@ -32,9 +32,25 @@ func (c *UserController) Register(ctx *gin.Context) {
 		ErrorResponse(ctx, err.Error())
 	} else {
 		ctx.JSON(http.StatusOK, dto.UserResponse{
-			Response: dto.Response{StatusCode: 0, StatusMsg: "test"},
+			Response: dto.Response{StatusCode: 0, StatusMsg: "register successfully"},
 			UserDTO:  *userDTO,
 			//!!!这里报错，必须是if else,不然这里就会对空指针解引用！！！
+		})
+	}
+}
+
+// Register handels `/user/login/`
+func (c *UserController) Login(ctx *gin.Context) {
+	username := ctx.Query("username")
+	password := ctx.Query("password")
+
+	userDTO, err := c.userService.Login(username, password)
+	if err != nil {
+		ErrorResponse(ctx, err.Error())
+	} else {
+		ctx.JSON(http.StatusOK, dto.UserResponse{
+			Response: dto.Response{StatusCode: 0, StatusMsg: "login successfully"},
+			UserDTO:  *userDTO,
 		})
 	}
 }

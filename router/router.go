@@ -23,6 +23,7 @@ func InitRouter() *gin.Engine {
 
 	//basic apis
 	apiRouter.POST("user/register/", userController.Register)
+	apiRouter.POST("user/login/", userController.Login)
 
 	return r
 

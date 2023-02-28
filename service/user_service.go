@@ -20,7 +20,10 @@ const (
 
 type UserService interface {
 	Register(username string, password string) (*dto.UserDTO, error)
+	Login(username string, password string) (*dto.UserDTO, error)
+
 	ParamValid(username string, password string) error
+	FindByName(username string) (*entity.User, error)
 }
 
 // 接口的实例
@@ -36,29 +39,39 @@ func (c *userService) Register(username string, password string) (*dto.UserDTO, 
 	if err := c.ParamValid(username, password); err != nil {
 		return nil, errors.New("username or password length error")
 	}
-
 	//1、查询数据库是否存在
-	uq := dao.Q.User
-	if _, err := uq.Where(uq.Username.Eq(username)).First(); err == nil {
-		return nil, errors.New("username already exists")
+	if _, err := c.FindByName(username); err == nil {
+		return nil, errors.New("username has exits")
 	}
-
 	//2、密码加密
 	hashPassword, _ := utils.PasswordHash(password)
-
 	//3、插入数据库
+	uq := dao.Q.User
 	user := entity.User{
 		Username: username,
 		Password: hashPassword,
 	}
-
 	if err := uq.Create(&user); err != nil {
 		return nil, errors.New("create user failed")
 	}
 	//token生成
 	token, _ := utils.GenToken(user.ID)
-
 	//4、返回结果
+	return &dto.UserDTO{UserID: user.ID, Token: token}, nil
+}
+
+func (c *userService) Login(username string, password string) (*dto.UserDTO, error) {
+	if err := c.ParamValid(username, password); err != nil {
+		return nil, errors.New("username or password length error")
+	}
+	user, err := c.FindByName(username)
+	if err != nil {
+		return nil, errors.New("username doesn't exits")
+	}
+	if !utils.PasswordValid(user.Password, password) {
+		return nil, errors.New("username or password error")
+	}
+	token, _ := utils.GenToken(user.ID)
 	return &dto.UserDTO{UserID: user.ID, Token: token}, nil
 }
 
@@ -78,4 +91,13 @@ func (c *userService) ParamValid(username string, password string) error {
 		return errors.New("password length error")
 	}
 	return nil
+}
+
+func (c *userService) FindByName(username string) (*entity.User, error) {
+	uq := dao.Q.User
+	if user, err := uq.Where(uq.Username.Eq(username)).First(); err == nil {
+		return user, nil
+	} else {
+		return nil, err
+	}
 }
