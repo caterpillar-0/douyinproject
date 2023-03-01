@@ -21,9 +21,11 @@ const (
 type UserService interface {
 	Register(username string, password string) (*dto.UserDTO, error)
 	Login(username string, password string) (*dto.UserDTO, error)
+	GetUser(userid uint) (*dto.UserInfoDTO, error)
 
 	ParamValid(username string, password string) error
 	FindByName(username string) (*entity.User, error)
+	FindByID(userid uint) (*entity.User, error)
 }
 
 // 接口的实例
@@ -75,6 +77,14 @@ func (c *userService) Login(username string, password string) (*dto.UserDTO, err
 	return &dto.UserDTO{UserID: user.ID, Token: token}, nil
 }
 
+func (c *userService) GetUser(userid uint) (*dto.UserInfoDTO, error) {
+	user, err := c.FindByID(userid)
+	if err != nil {
+		return nil, errors.New("userid find failed")
+	}
+	return dto.NewUserInfoDTO(user, userid), nil
+}
+
 func (c *userService) ParamValid(username string, password string) error {
 	//1.username
 	if username == "" {
@@ -96,6 +106,15 @@ func (c *userService) ParamValid(username string, password string) error {
 func (c *userService) FindByName(username string) (*entity.User, error) {
 	uq := dao.Q.User
 	if user, err := uq.Where(uq.Username.Eq(username)).First(); err == nil {
+		return user, nil
+	} else {
+		return nil, err
+	}
+}
+
+func (c *userService) FindByID(userid uint) (*entity.User, error) {
+	uq := dao.Q.User
+	if user, err := uq.Where(uq.ID.Eq(userid)).First(); err == nil {
 		return user, nil
 	} else {
 		return nil, err

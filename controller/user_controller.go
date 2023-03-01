@@ -3,6 +3,7 @@ package controller
 import (
 	"MyProject/dto"
 	"MyProject/service"
+	"MyProject/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -39,7 +40,7 @@ func (c *UserController) Register(ctx *gin.Context) {
 	}
 }
 
-// Register handels `/user/login/`
+// Login handels `/user/login/`
 func (c *UserController) Login(ctx *gin.Context) {
 	username := ctx.Query("username")
 	password := ctx.Query("password")
@@ -51,6 +52,29 @@ func (c *UserController) Login(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, dto.UserResponse{
 			Response: dto.Response{StatusCode: 0, StatusMsg: "login successfully"},
 			UserDTO:  *userDTO,
+		})
+	}
+}
+
+// Login handels `/user/`
+func (c *UserController) GetUserInfo(ctx *gin.Context) {
+	//验证token_id和user_id
+	userRawID := ctx.Query("user_id") //string类型
+	userID, _ := utils.String2uint(userRawID)
+	tokenRawId, _ := ctx.Get("token_id") //interface{}uint类型
+	tokenID := tokenRawId.(uint)
+	if userID != tokenID {
+		ErrorResponse(ctx, "error token or user_id")
+		return
+	}
+
+	userInfoDTO, err := c.userService.GetUser(userID)
+	if err != nil {
+		ErrorResponse(ctx, err.Error())
+	} else {
+		ctx.JSON(http.StatusOK, dto.UserInfoResponse{
+			Response:    dto.Response{StatusCode: 0, StatusMsg: "Get userinfo successfully"},
+			UserInfoDTO: *userInfoDTO,
 		})
 	}
 }

@@ -2,6 +2,7 @@ package utils
 
 import (
 	"errors"
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -70,7 +71,7 @@ func ParseToken(tokenString string) (*MyCustomClaims, error) {
 	}
 }
 
-// 验证token是否过期
+// 验证token是否过期/有效
 func ValidToken(tokenString string) (*MyCustomClaims, error) {
 	if tokenString == "" {
 		return nil, errors.New("empty token")
@@ -84,4 +85,12 @@ func ValidToken(tokenString string) (*MyCustomClaims, error) {
 		return nil, errors.New("expired token")
 	}
 	return claims, nil
+}
+
+func String2uint(str string) (uint, error) {
+	num, err := strconv.ParseUint(str, 10, 64)
+	if err != nil {
+		return 0, err
+	}
+	return uint(num), nil
 }

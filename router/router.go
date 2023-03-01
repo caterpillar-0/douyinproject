@@ -2,6 +2,7 @@ package router
 
 import (
 	"MyProject/controller"
+	"MyProject/middleware"
 	"MyProject/service"
 
 	"github.com/gin-gonic/gin"
@@ -24,6 +25,7 @@ func InitRouter() *gin.Engine {
 	//basic apis
 	apiRouter.POST("user/register/", userController.Register)
 	apiRouter.POST("user/login/", userController.Login)
+	apiRouter.GET("user/", middleware.JWTMiddleware(), userController.GetUserInfo)
 
 	return r
 
