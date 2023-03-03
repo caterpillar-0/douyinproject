@@ -61,8 +61,7 @@ func (c *UserController) GetUserInfo(ctx *gin.Context) {
 	//验证token_id和user_id
 	userRawID := ctx.Query("user_id") //string类型
 	userID, _ := utils.String2uint(userRawID)
-	tokenRawId, _ := ctx.Get("token_id") //interface{}uint类型
-	tokenID := tokenRawId.(uint)
+	tokenID := GETID(ctx)
 	if userID != tokenID {
 		ErrorResponse(ctx, "error token or user_id")
 		return

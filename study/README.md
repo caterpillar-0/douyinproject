@@ -41,7 +41,7 @@ go语言文档地址：https://books.studygolang.com/gopl-zh/ch6/ch6-01.html
   - ![image-20230224205522927](https://raw.githubusercontent.com/caterpillar-0/picture/main/image-20230224205522927.png)
   - ![image-20230224205504528](https://raw.githubusercontent.com/caterpillar-0/picture/main/image-20230224205504528.png)
 - **2、基于指针对象的方法**
-  - ![image-20230224205712387](C:\Users\Dell\AppData\Roaming\Typora\typora-user-images\image-20230224205712387.png)
+  - ![image-20230224205712387](.assets/image-20230224205712387.png)
 - **3、注意**
   - ![image-20230224210006047](https://raw.githubusercontent.com/caterpillar-0/picture/main/image-20230224210006047.png)
 
@@ -73,7 +73,7 @@ go语言文档地址：https://books.studygolang.com/gopl-zh/ch6/ch6-01.html
 
 > - 1、form（表单），是HTML标记语法的重要语法元素；
 > - 2、HTTP通常作为HTML传输的载体；
->   - ![image-20230301212910069](go_study.assets/image-20230301212910069.png)
+>   - ![image-20230301212910069](.assets/image-20230301212910069.png)
 
 
 
@@ -82,24 +82,32 @@ go语言文档地址：https://books.studygolang.com/gopl-zh/ch6/ch6-01.html
 ### 3.2 publish/action
 
 > - multipart/form-data
->   - ![image-20230301214927478](go_study.assets/image-20230301214927478.png)
+>   - ![image-20230301214927478](.assets/image-20230301214927478.png)
 >   - 而且是多表单，分别是title,token和data
 > - post，表单数据在body里
->   - ![image-20230301214915911](go_study.assets/image-20230301214915911.png)
+>   - ![image-20230301214915911](.assets/image-20230301214915911.png)
 
 
 
 
 
+## 4 gorm
 
+中文文档地址：https://gorm.cn/zh_CN/docs/preload.html
 
+### 4.1 关联 
 
+#### 4.1.1 belongs to
 
+- video视频belongs to 用户user;
+  - ![image-20230302211812528](.assets/image-20230302211812528.png)
+  - ![image-20230302211850512](.assets/image-20230302211850512.png)
+- **gorm通过preload、Joins预加载belongs to关联的记录，**
+- **preload预加载**
+  - ![image-20230302212036836](.assets/image-20230302212036836.png)
 
-
-
-
-
+- **注意：gorm中一对多关系，belongs to && have many**
+  - ![image-20230303192002177](.assets/image-20230303192002177.png)
 
 
 

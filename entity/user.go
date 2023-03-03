@@ -6,11 +6,12 @@ import (
 
 type User struct {
 	gorm.Model
-	Username       string `gorm:"size:50"`
-	Password       string `gorm:"size:200"`
-	FollowCount    uint   `gorm:"default:0"`
-	FollowerCount  uint   `gorm:"default:0"`
-	TotalFavorited uint   `gorm:"default:0"`
-	WorkCount      uint   `gorm:"default:0"`
-	FavoriteCount  uint   `gorm:"default:0"`
+	Username       string  `gorm:"size:50"`
+	Password       string  `gorm:"size:200"`
+	FollowCount    uint    `gorm:"default:0"`
+	FollowerCount  uint    `gorm:"default:0"`
+	TotalFavorited uint    `gorm:"default:0"`
+	WorkCount      uint    `gorm:"default:0"`
+	FavoriteCount  uint    `gorm:"default:0"`
+	Videos         []Video `gorm:"foreignkey:UserID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }

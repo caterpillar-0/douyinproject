@@ -11,7 +11,10 @@ import (
 func JWTMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		// get token string
-		tokenString := ctx.Query("token")
+		tokenString := ctx.Query("token") //url中
+		if tokenString == "" {
+			tokenString = ctx.PostForm("token") //表单中
+		}
 		claims, err := utils.ValidToken(tokenString)
 		if err != nil {
 			controller.ErrorResponse(ctx, err.Error())

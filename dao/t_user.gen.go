@@ -38,6 +38,24 @@ func newUser(db *gorm.DB, opts ...gen.DOOption) user {
 	_user.TotalFavorited = field.NewUint(tableName, "total_favorited")
 	_user.WorkCount = field.NewUint(tableName, "work_count")
 	_user.FavoriteCount = field.NewUint(tableName, "favorite_count")
+	_user.Videos = userHasManyVideos{
+		db: db.Session(&gorm.Session{}),
+
+		RelationField: field.NewRelation("Videos", "entity.Video"),
+		User: struct {
+			field.RelationField
+			Videos struct {
+				field.RelationField
+			}
+		}{
+			RelationField: field.NewRelation("Videos.User", "entity.User"),
+			Videos: struct {
+				field.RelationField
+			}{
+				RelationField: field.NewRelation("Videos.User.Videos", "entity.Video"),
+			},
+		},
+	}
 
 	_user.fillFieldMap()
 
@@ -59,6 +77,7 @@ type user struct {
 	TotalFavorited field.Uint
 	WorkCount      field.Uint
 	FavoriteCount  field.Uint
+	Videos         userHasManyVideos
 
 	fieldMap map[string]field.Expr
 }
@@ -102,7 +121,7 @@ func (u *user) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (u *user) fillFieldMap() {
-	u.fieldMap = make(map[string]field.Expr, 11)
+	u.fieldMap = make(map[string]field.Expr, 12)
 	u.fieldMap["id"] = u.ID
 	u.fieldMap["created_at"] = u.CreatedAt
 	u.fieldMap["updated_at"] = u.UpdatedAt
@@ -114,6 +133,7 @@ func (u *user) fillFieldMap() {
 	u.fieldMap["total_favorited"] = u.TotalFavorited
 	u.fieldMap["work_count"] = u.WorkCount
 	u.fieldMap["favorite_count"] = u.FavoriteCount
+
 }
 
 func (u user) clone(db *gorm.DB) user {
@@ -124,6 +144,79 @@ func (u user) clone(db *gorm.DB) user {
 func (u user) replaceDB(db *gorm.DB) user {
 	u.userDo.ReplaceDB(db)
 	return u
+}
+
+type userHasManyVideos struct {
+	db *gorm.DB
+
+	field.RelationField
+
+	User struct {
+		field.RelationField
+		Videos struct {
+			field.RelationField
+		}
+	}
+}
+
+func (a userHasManyVideos) Where(conds ...field.Expr) *userHasManyVideos {
+	if len(conds) == 0 {
+		return &a
+	}
+
+	exprs := make([]clause.Expression, 0, len(conds))
+	for _, cond := range conds {
+		exprs = append(exprs, cond.BeCond().(clause.Expression))
+	}
+	a.db = a.db.Clauses(clause.Where{Exprs: exprs})
+	return &a
+}
+
+func (a userHasManyVideos) WithContext(ctx context.Context) *userHasManyVideos {
+	a.db = a.db.WithContext(ctx)
+	return &a
+}
+
+func (a userHasManyVideos) Model(m *entity.User) *userHasManyVideosTx {
+	return &userHasManyVideosTx{a.db.Model(m).Association(a.Name())}
+}
+
+type userHasManyVideosTx struct{ tx *gorm.Association }
+
+func (a userHasManyVideosTx) Find() (result []*entity.Video, err error) {
+	return result, a.tx.Find(&result)
+}
+
+func (a userHasManyVideosTx) Append(values ...*entity.Video) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Append(targetValues...)
+}
+
+func (a userHasManyVideosTx) Replace(values ...*entity.Video) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Replace(targetValues...)
+}
+
+func (a userHasManyVideosTx) Delete(values ...*entity.Video) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Delete(targetValues...)
+}
+
+func (a userHasManyVideosTx) Clear() error {
+	return a.tx.Clear()
+}
+
+func (a userHasManyVideosTx) Count() int64 {
+	return a.tx.Count()
 }
 
 type userDo struct{ gen.DO }

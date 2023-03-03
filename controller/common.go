@@ -13,3 +13,10 @@ func ErrorResponse(ctx *gin.Context, msg string) {
 		StatusMsg:  msg,
 	})
 }
+
+// 获取token中ID
+func GETID(ctx *gin.Context) uint {
+	tokenRawId, _ := ctx.Get("token_id") //interface{}uint类型
+	tokenID := tokenRawId.(uint)
+	return tokenID
+}

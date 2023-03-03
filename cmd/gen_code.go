@@ -17,7 +17,7 @@ func genCode() {
 	g.UseDB(db) // reuse your gorm db
 
 	// Generate basic type-safe DAO API for struct `entity.User` following conventions
-	g.ApplyBasic(entity.User{})
+	g.ApplyBasic(entity.User{}, entity.Video{})
 
 	// Generate the code
 	g.Execute()

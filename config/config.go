@@ -44,7 +44,7 @@ func LoadDB() *gorm.DB {
 
 func SetupDB() {
 	db := LoadDB()
-	db.AutoMigrate(&entity.User{})
+	db.AutoMigrate(&entity.User{}, &entity.Video{})
 	//combine db with global val Q, otherwise Q = dao.User(db)
 	dao.SetDefault(db)
 
